@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="FinalTravel:war">
+    <output-path>$PROJECT_DIR$/../FinalTravel/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>FinalTravel</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="FinalTravel-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="FinalTravel:war exploded" />
+    </root>
+  </artifact>
+</component>

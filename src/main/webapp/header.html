@@ -1,0 +1,126 @@
+<script>
+    $(function () {
+        //遍历显示导航条
+        $.get(
+            "category",
+            function (data) {
+                //遍历加载到页面
+                var lis='<li class="nav-active"><a href="index.html">首页</a></li>';
+                for (let i = 0; i < data.length; i++) {
+                    var ele=data[i];
+                    console.log(data[i]);
+                    var selectName = $('#search_input').val();
+                    console.log(selectName)
+                    $('#search_input').attr("value",selectName);
+                    lis+=' <li><a href="route_list.html?cid='+ele.cid+'&selectName='+selectName+'">'+ele.cname+'</a></li>';
+                }
+                //选中列表标签进行数据填充
+                $("#myUl").html(lis);
+            },
+            "json"
+        );
+
+        /*
+        * 加载登录用户
+        * 先查cookie
+        * 再查session
+        * */
+        $.get(
+            "cookieServlet",
+            function (data) {
+                if (data==''||data==null||data=="nocookie"){
+                    //查session
+                    $.get(
+                        "header",
+                        function (headerData) {
+                            if (headerData==''||headerData==null){
+                                $('#login_out').attr("style","display:block;");
+                                $('#login').attr("style","display:none;");
+                            }else {
+                                $('#login_out').attr("style","display:none;");
+                                $('#login').attr("style","display:block;");
+                                $('#nameSpan').html("欢迎回来，"+headerData.name);
+                            }
+                        },
+                        "json",
+                    )
+                }else {
+                    $('#login_out').attr("style","display:none;");
+                    $('#login').attr("style","display:block;");
+                    $('#nameSpan').html("欢迎回来，"+data.name);
+                }
+            },
+            "json"
+        )
+
+
+        //注销
+        $('#a_out').click(function () {
+            location.href="cancellation";
+        })
+
+
+
+    })
+
+    //搜索路线传参
+    function  searchRoute(){
+        var value = location.search;
+        //对value 进行截取
+        var strArr = value.split("=");
+        //当前模块
+        var cid=strArr[1];
+        var selectName = $('#search_input').val();
+        location.href="./route_list.html?selectName="+encodeURI(selectName)+"&cid="+cid+"&start=1";
+
+    }
+
+</script>
+<!-- 头部 start -->
+    <header id="header">
+        <div class="top_banner">
+            <img src="images/top_banner.jpg" alt="">
+        </div>
+        <div class="shortcut">
+            <!-- 未登录状态  -->
+            <div class="login_out" id="login_out" >
+                <a href="login.html" >登录</a>
+                <a href="register.html">注册</a>
+            </div>
+            <!-- 登录状态  -->
+            <div class="login" id="login" style="display:none;">
+                <span id="nameSpan"></span>
+                <a href="myfavorite.html" class="collection" >我的收藏</a>
+                <a href="javascript:void(0)" id="a_out">退出</a>
+            </div>
+        </div>
+        <div class="header_wrap">
+            <div class="topbar">
+                <div class="logo">
+                    <a href="/"><img src="images/logo.jpg" alt=""></a>
+                </div>
+                <div class="search">
+                    <input id="search_input" type="text" placeholder="请输入路线名称" class="search_input" autocomplete="off">
+                    <!--"javascript:;"固定格式，可以定义方法 点击会执行方法-->
+                    <a href="javascript:searchRoute()"  class="search-button">搜索</a>
+                </div>
+                <div class="hottel">
+                    <div class="hot_pic">
+                        <img src="images/hot_tel.jpg" alt="">
+                    </div>
+                    <div class="hot_tel">
+                        <p class="hot_time">客服热线(9:00-6:00)</p>
+                        <p class="hot_num">400-618-9090</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- 头部 end -->
+     <!-- 首页导航 -->
+    <div class="navitem">
+        <ul class="nav" id="myUl">
+
+        </ul>
+    </div>
+    

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/register.css">
+    <!--阿里图标通用样式-->
+    <style>
+        .icon {
+            width: 2em;
+            height: 2em;
+            vertical-align: -0.15em;
+            fill: currentColor;
+            overflow: hidden;
+        }
+    </style>
+    <!--导入jquery-->
+    <script src="js/jquery-3.3.1.js"></script>
+    <!--引入阿里图标库-->
+    <script src="./js/iconfont.js"></script>
+    <script>
+        /*
+               * 前端校验
+               * 用户名：
+               * 密码：
+               * 邮箱：
+               * 生日：不能为空
+               * 验证码：不能为空
+               * */
+        //验证用户名
+        function checkUserName() {
+            var regx = /^\w{6,16}$/;
+            var username = $('#username').val();
+            var flag = regx.test(username);
+            if (flag) {
+                //格式正确去验证数据库
+                $.post(
+                    "/travel/checkUserByName",
+                    {"username": username},
+                    function (data) {
+                        //接收判断
+                        if (data.flag) {
+                            $("#username").css("border", "1px solid green")
+                            $('#icon_1').attr("display", "none");
+                            $('#icon_2').attr("display", "block");
+                            return true;
+                        } else {
+                            alert("账号已存在")
+                            $("#username").css("border", "1px solid red")
+                            $('#icon_1').attr("display", "block");
+                            $('#icon_2').attr("display", "none");
+                            return false;
+                        }
+                    },
+                    "json"
+                )
+            } else {
+                $('#icon_1').attr("display", "block");
+                $('#icon_2').attr("display", "none");
+                return false;
+            }
+        };
+
+        //校验密码
+        function checkPassword() {
+            var regx = /^\w{6,16}$/;
+            var password = $('#password').val();
+            var flag = regx.test(password);
+            if (flag) {
+                $("#password").css("border", "1px solid green")
+                $('#icon_3').attr("display", "none");
+                $('#icon_4').attr("display", "block");
+                return true;
+            } else {
+                $("#password").css("border", "1px solid red")
+                $('#icon_3').attr("display", "block");
+                $('#icon_4').attr("display", "none");
+                return false;
+            }
+        }
+
+        //校验邮箱
+        function checkEmail() {
+            var regx = new RegExp("^[a-z0-9A-Z]+[- | a-z0-9A-Z . _]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$");
+            var email = $('#email').val();
+            var flag = regx.test(email);
+            if (flag) {
+                $("#email").css("border", "1px solid green");
+                $('#icon_5').attr("display", "none");
+                $('#icon_6').attr("display", "block");
+                return true;
+            } else {
+                $("#email").css("border", "1px solid red");
+                $('#icon_5').attr("display", "block");
+                $('#icon_6').attr("display", "none");
+                return false;
+            }
+        }
+
+        //校验真实名字
+        function checkName() {
+            var name = $('#name').val().replace(/\s/g, "");//去除空格
+            var regx = /^[\u4e00-\u9fa5]{2,4}$/;
+            var flag = regx.test(name);
+            if (flag) {
+                $("#name").css("border", "1px solid green");
+                $('#icon_7').attr("display", "none");
+                $('#icon_8').attr("display", "block");
+                return true;
+            } else {
+                $("#name").css("border", "1px solid red");
+                $('#icon_7').attr("display", "block");
+                $('#icon_8').attr("display", "none");
+                return false;
+            }
+        }
+
+        //校验手机号
+        function checkTelephone() {
+            var telephone = $('#telephone').val().replace(/\s/g, "");//去除空格
+            //校验手机号，号段主要有(不包括上网卡)：130~139、150~153，155~159，180~189、170~171、176~178。14号段为上网卡专属号段
+            var regx = /^((13[0-9])|(17[0-1,6-8])|(15[^4,\\D])|(18[0-9]))\d{8}$/;
+            var flag = regx.test(telephone);
+            if (flag) {
+                $("#telephone").css("border", "1px solid green")
+                $('#icon_9').attr("display", "none");
+                $('#icon_10').attr("display", "block");
+                return true;
+            } else {
+                $("#telephone").css("border", "1px solid red")
+                $('#icon_9').attr("display", "block");
+                $('#icon_10').attr("display", "none");
+                return false;
+            }
+        }
+
+        //校验生日
+        function checkBirthday() {
+            var birthday = $('#birthday').val();
+            if (birthday == null || birthday == "" || birthday == '') {
+                $("#birthday").css("border", "1px solid red")
+                $('#icon_11').attr("display", "block");
+                $('#icon_12').attr("display", "none");
+                return false;
+            } else {
+                $("#birthday").css("border", "1px solid green")
+                $('#icon_11').attr("display", "none");
+                $('#icon_12').attr("display", "block");
+                return true;
+            }
+        }
+
+        //校验验证码
+        function checkCheck() {
+            var check = $('#check').val();
+            if (check == null || check == "" || check == '') {
+                $("#check").css("border", "1px solid red")
+                return false;
+            } else {
+                $("#check").css("border", "1px solid green")
+                return true;
+            }
+        }
+
+        //阻止表单提交 表单提交的submit
+        $(function () {
+            //验证用户名
+            var usernameFlag = $('#username').blur(checkUserName);
+            //校验密码
+            var passwordFlag = $('#password').blur(checkPassword);
+            //校验邮箱
+            var emailFlag = $('#email').blur(checkEmail);
+            //校验真实名字
+            var nameFlag = $('#name').blur(checkName);
+            //校验手机号
+            var telephoneFlag = $('#telephone').blur(checkTelephone);
+            //校验生日
+            var birthdayFlag = $('#birthday').blur(checkBirthday)
+            //校验验证码
+            var checkFlag = $('#check').blur(checkCheck);
+
+            //获得表单 调用表单的submit方法
+            $('#registerForm').submit(function () {
+                //发送ajax请求 携带表单数据到后台
+                //jquery中有一个serialize()方法 可以实现 对表单数据进行序列化 name=zhangsan
+                var data = $('#registerForm').serialize();
+                if (
+                    usernameFlag && passwordFlag && emailFlag && nameFlag &&
+                    telephoneFlag && birthdayFlag && checkFlag
+                ) {
+                    $.post(
+                        "register",
+                        data,
+                        function (resData) {
+                            //接收数据
+                            if (resData.flag) {
+                                //注册成功
+                                location.href = "./register_ok.html";
+                            } else {
+                                $("#check").css("border", "1px solid red")
+                            }
+                        },
+                        "json"
+                    )
+                }
+                //返回false 阻止表单提交
+                return false;
+            });
+
+        })
+    </script>
+</head>
+<body>
+<!--引入头部-->
+<div id="header"></div>
+<!-- 头部 end -->
+<div class="rg_layout">
+    <div class="rg_form clearfix">
+        <div class="rg_form_left">
+            <p>新用户注册</p>
+            <p>USER REGISTER</p>
+            <a href="http://192.168.10.108:8080/travel/checkEmail?code=" +user.getCode></a>
+        </div>
+        <div class="rg_form_center">
+
+            <!--注册表单-->
+            <form id="registerForm">
+                <!--提交处理请求的标识符-->
+                <input type="hidden" name="action" value="register">
+                <table style="margin-top: 25px;">
+                    <tr>
+                        <td class="td_left">
+                            <label for="username">用户名</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="username" name="username" placeholder="请输入账号(6-16位)">
+                        <td>
+                            <svg id="icon_1" display="none" t="1603699324662" class="icon" viewBox="0 0 1024 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2596" width="200" height="200">
+                                <path d="M873.948 149.944c-199.906-199.925-524-199.925-723.905 0-200.057 199.924-200.057 524.188 0 724.112s524.132 199.925 724.056 0c199.887-199.924 199.887-524.188-0.151-724.112zM735.064 672.425c17.256 17.256 17.256 45.34 0 62.596-17.256 17.256-45.32 17.256-62.577 0L511.929 574.596 351.505 735.021c-17.256 17.256-45.321 17.256-62.577 0a44.335 44.335 0 0 1 0-62.596L449.465 512l-160.54-160.425a44.335 44.335 0 0 1 0-62.596c17.257-17.256 45.322-17.256 62.578 0l160.425 160.425 160.407-160.425c17.257-17.256 45.34-17.256 62.578 0 17.256 17.256 17.256 45.34 0 62.596L574.543 512l160.54 160.425z"
+                                      fill="#FB6041" p-id="2597"></path>
+                            </svg>
+                            <svg id="icon_2" display="none" t="1603699193963" class="icon" viewBox="0 0 1075 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1863" width="200" height="200">
+                                <path d="M725.1456 311.4496L397.312 630.6304 311.808 485.376a36.5568 36.5568 0 0 0-49.152-13.056 34.304 34.304 0 0 0-13.4144 47.7184l108.9536 185.088a36.352 36.352 0 0 0 31.3344 17.7152 36.5568 36.5568 0 0 0 26.3168-11.1104l0.4096-0.3584 359.8336-350.3616a34.304 34.304 0 0 0-0.1024-49.4592 36.5056 36.5056 0 0 0-50.8416-0.1024zM515.584 0c282.8288 0 512 229.2224 512 512s-229.1712 512-512 512c-282.7776 0-512-229.2224-512-512s229.2224-512 512-512z"
+                                      fill="#00BA64" p-id="1864"></path>
+                            </svg>
+                        </td>
+                        </td>
+
+
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="password">密码</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="password" name="password" placeholder="请输入密码(6-16位)">
+                        <td>
+                            <svg id="icon_3" display="none" t="1603699324662" class="icon" viewBox="0 0 1024 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2596" width="200" height="200">
+                                <path d="M873.948 149.944c-199.906-199.925-524-199.925-723.905 0-200.057 199.924-200.057 524.188 0 724.112s524.132 199.925 724.056 0c199.887-199.924 199.887-524.188-0.151-724.112zM735.064 672.425c17.256 17.256 17.256 45.34 0 62.596-17.256 17.256-45.32 17.256-62.577 0L511.929 574.596 351.505 735.021c-17.256 17.256-45.321 17.256-62.577 0a44.335 44.335 0 0 1 0-62.596L449.465 512l-160.54-160.425a44.335 44.335 0 0 1 0-62.596c17.257-17.256 45.322-17.256 62.578 0l160.425 160.425 160.407-160.425c17.257-17.256 45.34-17.256 62.578 0 17.256 17.256 17.256 45.34 0 62.596L574.543 512l160.54 160.425z"
+                                      fill="#FB6041" p-id="2597"></path>
+                            </svg>
+                            <svg id="icon_4" display="none" t="1603699193963" class="icon" viewBox="0 0 1075 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1863" width="200" height="200">
+                                <path d="M725.1456 311.4496L397.312 630.6304 311.808 485.376a36.5568 36.5568 0 0 0-49.152-13.056 34.304 34.304 0 0 0-13.4144 47.7184l108.9536 185.088a36.352 36.352 0 0 0 31.3344 17.7152 36.5568 36.5568 0 0 0 26.3168-11.1104l0.4096-0.3584 359.8336-350.3616a34.304 34.304 0 0 0-0.1024-49.4592 36.5056 36.5056 0 0 0-50.8416-0.1024zM515.584 0c282.8288 0 512 229.2224 512 512s-229.1712 512-512 512c-282.7776 0-512-229.2224-512-512s229.2224-512 512-512z"
+                                      fill="#00BA64" p-id="1864"></path>
+                            </svg>
+                        </td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="email">Email</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="email" name="email" placeholder="请输入Email">
+                        <td>
+                            <svg id="icon_5" display="none" t="1603699324662" class="icon" viewBox="0 0 1024 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2596" width="200" height="200">
+                                <path d="M873.948 149.944c-199.906-199.925-524-199.925-723.905 0-200.057 199.924-200.057 524.188 0 724.112s524.132 199.925 724.056 0c199.887-199.924 199.887-524.188-0.151-724.112zM735.064 672.425c17.256 17.256 17.256 45.34 0 62.596-17.256 17.256-45.32 17.256-62.577 0L511.929 574.596 351.505 735.021c-17.256 17.256-45.321 17.256-62.577 0a44.335 44.335 0 0 1 0-62.596L449.465 512l-160.54-160.425a44.335 44.335 0 0 1 0-62.596c17.257-17.256 45.322-17.256 62.578 0l160.425 160.425 160.407-160.425c17.257-17.256 45.34-17.256 62.578 0 17.256 17.256 17.256 45.34 0 62.596L574.543 512l160.54 160.425z"
+                                      fill="#FB6041" p-id="2597"></path>
+                            </svg>
+                            <svg id="icon_6" display="none" t="1603699193963" class="icon" viewBox="0 0 1075 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1863" width="200" height="200">
+                                <path d="M725.1456 311.4496L397.312 630.6304 311.808 485.376a36.5568 36.5568 0 0 0-49.152-13.056 34.304 34.304 0 0 0-13.4144 47.7184l108.9536 185.088a36.352 36.352 0 0 0 31.3344 17.7152 36.5568 36.5568 0 0 0 26.3168-11.1104l0.4096-0.3584 359.8336-350.3616a34.304 34.304 0 0 0-0.1024-49.4592 36.5056 36.5056 0 0 0-50.8416-0.1024zM515.584 0c282.8288 0 512 229.2224 512 512s-229.1712 512-512 512c-282.7776 0-512-229.2224-512-512s229.2224-512 512-512z"
+                                      fill="#00BA64" p-id="1864"></path>
+                            </svg>
+                        </td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="name">姓名</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="name" name="name" placeholder="请输入真实姓名(2-4位)">
+                        <td>
+                            <svg id="icon_7" display="none" t="1603699324662" class="icon" viewBox="0 0 1024 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2596" width="200" height="200">
+                                <path d="M873.948 149.944c-199.906-199.925-524-199.925-723.905 0-200.057 199.924-200.057 524.188 0 724.112s524.132 199.925 724.056 0c199.887-199.924 199.887-524.188-0.151-724.112zM735.064 672.425c17.256 17.256 17.256 45.34 0 62.596-17.256 17.256-45.32 17.256-62.577 0L511.929 574.596 351.505 735.021c-17.256 17.256-45.321 17.256-62.577 0a44.335 44.335 0 0 1 0-62.596L449.465 512l-160.54-160.425a44.335 44.335 0 0 1 0-62.596c17.257-17.256 45.322-17.256 62.578 0l160.425 160.425 160.407-160.425c17.257-17.256 45.34-17.256 62.578 0 17.256 17.256 17.256 45.34 0 62.596L574.543 512l160.54 160.425z"
+                                      fill="#FB6041" p-id="2597"></path>
+                            </svg>
+                            <svg id="icon_8" display="none" t="1603699193963" class="icon" viewBox="0 0 1075 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1863" width="200" height="200">
+                                <path d="M725.1456 311.4496L397.312 630.6304 311.808 485.376a36.5568 36.5568 0 0 0-49.152-13.056 34.304 34.304 0 0 0-13.4144 47.7184l108.9536 185.088a36.352 36.352 0 0 0 31.3344 17.7152 36.5568 36.5568 0 0 0 26.3168-11.1104l0.4096-0.3584 359.8336-350.3616a34.304 34.304 0 0 0-0.1024-49.4592 36.5056 36.5056 0 0 0-50.8416-0.1024zM515.584 0c282.8288 0 512 229.2224 512 512s-229.1712 512-512 512c-282.7776 0-512-229.2224-512-512s229.2224-512 512-512z"
+                                      fill="#00BA64" p-id="1864"></path>
+                            </svg>
+                        </td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="telephone">手机号</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="telephone" name="telephone" placeholder="请输入您的手机号(11位)">
+                        <td>
+                            <svg id="icon_9" display="none" t="1603699324662" class="icon" viewBox="0 0 1024 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2596" width="200" height="200">
+                                <path d="M873.948 149.944c-199.906-199.925-524-199.925-723.905 0-200.057 199.924-200.057 524.188 0 724.112s524.132 199.925 724.056 0c199.887-199.924 199.887-524.188-0.151-724.112zM735.064 672.425c17.256 17.256 17.256 45.34 0 62.596-17.256 17.256-45.32 17.256-62.577 0L511.929 574.596 351.505 735.021c-17.256 17.256-45.321 17.256-62.577 0a44.335 44.335 0 0 1 0-62.596L449.465 512l-160.54-160.425a44.335 44.335 0 0 1 0-62.596c17.257-17.256 45.322-17.256 62.578 0l160.425 160.425 160.407-160.425c17.257-17.256 45.34-17.256 62.578 0 17.256 17.256 17.256 45.34 0 62.596L574.543 512l160.54 160.425z"
+                                      fill="#FB6041" p-id="2597"></path>
+                            </svg>
+                            <svg id="icon_10" display="none" t="1603699193963" class="icon" viewBox="0 0 1075 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1863" width="200" height="200">
+                                <path d="M725.1456 311.4496L397.312 630.6304 311.808 485.376a36.5568 36.5568 0 0 0-49.152-13.056 34.304 34.304 0 0 0-13.4144 47.7184l108.9536 185.088a36.352 36.352 0 0 0 31.3344 17.7152 36.5568 36.5568 0 0 0 26.3168-11.1104l0.4096-0.3584 359.8336-350.3616a34.304 34.304 0 0 0-0.1024-49.4592 36.5056 36.5056 0 0 0-50.8416-0.1024zM515.584 0c282.8288 0 512 229.2224 512 512s-229.1712 512-512 512c-282.7776 0-512-229.2224-512-512s229.2224-512 512-512z"
+                                      fill="#00BA64" p-id="1864"></path>
+                            </svg>
+                        </td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="sex">性别</label>
+                        </td>
+                        <td class="td_right gender">
+                            <input type="radio" id="sex" name="sex" value="男" checked> 男
+                            <input type="radio" name="sex" value="女"> 女
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="birthday">生日</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="date" id="birthday" name="birthday" placeholder="年/月/日">
+                        <td>
+                            <svg id="icon_11" display="none" t="1603699324662" class="icon" viewBox="0 0 1024 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2596" width="200" height="200">
+                                <path d="M873.948 149.944c-199.906-199.925-524-199.925-723.905 0-200.057 199.924-200.057 524.188 0 724.112s524.132 199.925 724.056 0c199.887-199.924 199.887-524.188-0.151-724.112zM735.064 672.425c17.256 17.256 17.256 45.34 0 62.596-17.256 17.256-45.32 17.256-62.577 0L511.929 574.596 351.505 735.021c-17.256 17.256-45.321 17.256-62.577 0a44.335 44.335 0 0 1 0-62.596L449.465 512l-160.54-160.425a44.335 44.335 0 0 1 0-62.596c17.257-17.256 45.322-17.256 62.578 0l160.425 160.425 160.407-160.425c17.257-17.256 45.34-17.256 62.578 0 17.256 17.256 17.256 45.34 0 62.596L574.543 512l160.54 160.425z"
+                                      fill="#FB6041" p-id="2597"></path>
+                            </svg>
+                            <svg id="icon_12" display="none" t="1603699193963" class="icon" viewBox="0 0 1075 1024"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1863" width="200" height="200">
+                                <path d="M725.1456 311.4496L397.312 630.6304 311.808 485.376a36.5568 36.5568 0 0 0-49.152-13.056 34.304 34.304 0 0 0-13.4144 47.7184l108.9536 185.088a36.352 36.352 0 0 0 31.3344 17.7152 36.5568 36.5568 0 0 0 26.3168-11.1104l0.4096-0.3584 359.8336-350.3616a34.304 34.304 0 0 0-0.1024-49.4592 36.5056 36.5056 0 0 0-50.8416-0.1024zM515.584 0c282.8288 0 512 229.2224 512 512s-229.1712 512-512 512c-282.7776 0-512-229.2224-512-512s229.2224-512 512-512z"
+                                      fill="#00BA64" p-id="1864"></path>
+                            </svg>
+                        </td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                            <label for="check">验证码</label>
+                        </td>
+                        <td class="td_right check">
+                            <input type="text" id="check" name="check" class="check">
+                            <img src="checkCode" height="32px" alt="" onclick="changeCheckCode(this)">
+                            <script type="text/javascript">
+                                //图片点击事件
+                                function changeCheckCode(img) {
+                                    img.src = "checkCode?" + new Date().getTime();
+                                }
+                            </script>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td class="td_left">
+                        </td>
+                        <td class="td_right check">
+                            <input type="submit" class="submit" id="submit" value="注册">
+                            <span id="msg" style="color: red;"></span>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="rg_form_right">
+            <p>
+                已有账号？
+                <a href="login.html">立即登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+<!--引入尾部-->
+<div id="footer"></div>
+<!--导入布局js，共享header和footer-->
+<script type="text/javascript" src="js/include.js"></script>
+
+</body>
+</html>
